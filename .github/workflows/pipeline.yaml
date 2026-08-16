@@ -6,13 +6,13 @@ on:
       - 'features/*'
 
 jobs:
+
+  # ==========================================================
+  # 1. SCAN + VALIDATE
+  # ==========================================================
   scan:
     runs-on: ubuntu-latest
     environment: features/Plan
-    # permissions:
-    #   contents: read
-    #   id-token: write
-    
 
     steps:
       - name: Checkout
@@ -24,30 +24,57 @@ jobs:
       - name: Terraform Version
         run: terraform version
 
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Terraform Init
         run: terraform init
+
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+
+  # ==========================================================
+  # 2. APPROVAL
+  # ==========================================================
+  approval:
+    needs: scan
+    runs-on: ubuntu-latest
+
+    environment:
+      name: terraform-plan-approval
+
+    steps:
+      - name: Approval
+        run: echo "Approval received"
+
+
+  # ==========================================================
+  # 3. TERRAFORM PLAN
+  # ==========================================================
+  plan:
+    needs: approval
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Terraform Format
-        run: terraform fmt 
+      - name: Terraform Init
+        run: terraform init
 
-      - name: Terraform Validate
-        run: terraform validate
-
-        approval:
-        needs: scan
-        runs-on: ubuntu-latest
-
-        environment:
-        name: terraform-plan-approval
-
-        steps:
-        - name: Approval
-          run: echo "Approval received"
-
-        - name: Terraform Plan
-          run: terraform plan
+      - name: Terraform Plan
+        run: terraform plan
