@@ -3,7 +3,7 @@ name: RG pipeline
 on:
   push:
     branches:
-      - 'features/**'
+      - 'features/*'
 
 jobs:
   scan:
@@ -17,7 +17,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Version
-        run: terraform -version
+        run: terraform version
 
       - name: Terraform Init
         run: terraform init
