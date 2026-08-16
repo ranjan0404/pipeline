@@ -1,30 +1,40 @@
-name = RG pipeline
+name: RG pipeline
+
 on:
-push:
-branches:
--features/*
+  push:
+    branches:
+      - 'features/**'
+
 jobs:
-scan:
-runs-on: ubuntu-latest
-steps:
-- name: Checkout
-uses: actions/checkout@v3
-- name: Setup Terraform
-uses: hashicorp/setup-terraform@v2
--name: Terraform Version
-run: terraform -version
-- name: Terraform Init
-run: terraform init
--name: azure_login
-uses: azure/login@v1
-with:
-  client_id: ${{ secrets.CLIENT_ID }}
-  tenant_id: ${{ secrets.TENANT_ID }}
-  subscription_id: ${{ secrets.SUBSCRIPTION_ID }}
-  client_secret: ${{ secrets.CLIENT_SECRET }}
-  -name: Terraform fmt
-  run: terraform fmt -check
-  - name: Terraform validate
-  run: terraform validate
-  -name: Terraform plan
-  run: terraform plan
+  scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Version
+        run: terraform -version
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.CLIENT_ID }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
+          client-secret: ${{ secrets.CLIENT_SECRET }}
+
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan
