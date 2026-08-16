@@ -1,0 +1,30 @@
+name = RG pipeline
+on:
+push:
+branches:
+-features/*
+jobs:
+scan:
+runs-on: ubuntu-latest
+steps:
+- name: Checkout
+uses: actions/checkout@v3
+- name: Setup Terraform
+uses: hashicorp/setup-terraform@v2
+-name: Terraform Version
+run: terraform -version
+- name: Terraform Init
+run: terraform init
+-name: azure_login
+uses: azure/login@v1
+with:
+  client_id: ${{ secrets.CLIENT_ID }}
+  tenant_id: ${{ secrets.TENANT_ID }}
+  subscription_id: ${{ secrets.SUBSCRIPTION_ID }}
+  client_secret: ${{ secrets.CLIENT_SECRET }}
+  -name: Terraform fmt
+  run: terraform fmt -check
+  - name: Terraform validate
+  run: terraform validate
+  -name: Terraform plan
+  run: terraform plan
