@@ -8,6 +8,7 @@ on:
 jobs:
   scan:
     runs-on: ubuntu-latest
+    environment: features/Plan
     permissions:
       contents: read
       id-token: write
@@ -37,5 +38,16 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      - name: Terraform Plan
-        run: terraform plan
+        approval:
+        needs: scan
+        runs-on: ubuntu-latest
+
+        environment:
+        name: terraform-plan-approval
+
+        steps:
+        - name: Approval
+          run: echo "Approval received"
+
+        - name: Terraform Plan
+          run: terraform plan
