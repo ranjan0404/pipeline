@@ -9,9 +9,9 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     environment: features/Plan
-    permissions:
-      contents: read
-      id-token: write
+    # permissions:
+    #   contents: read
+    #   id-token: write
     
 
     steps:
